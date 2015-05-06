@@ -16,6 +16,9 @@ start_db(){
 db_backup() {
     local ver=$(cbd env export|grep DOCKER_TAG_CLOUDBREAK|sed "s/.*=//")
 
+    # for gracefull shutdown: run another containe with --volumes from
+    # docker exec cbdb bash -c 'kill -INT $(head -1 /var/lib/postgresql/data/postmaster.pid)'
+    
     mkdir -p release
     docker exec  cbreak_cbdb_1 tar cz -C /var/lib/postgresql/data . > release/cbdb-${ver}.tgz
 }
