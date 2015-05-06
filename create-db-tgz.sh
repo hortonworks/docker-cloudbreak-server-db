@@ -17,7 +17,6 @@ db_backup() {
 
     mkdir -p release
     docker exec  cbreak_cbdb_1 tar cz -C /var/lib/postgresql/data . > release/cbdb-${ver}.tgz
-    docker exec  cbreak_pcdb_1 tar cz -C /var/lib/postgresql/data . > release/pcdb-${ver}.tgz
 }
 
 main() {
