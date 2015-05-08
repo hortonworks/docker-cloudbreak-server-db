@@ -1,8 +1,13 @@
 #!/bin/bash
 
+: ${VERSION:=0.5.32}
 
 start_db(){
   echo 'export PUBLIC_IP=1.1.1.1'>Profile
+  echo "export DOCKER_TAG_CLOUDBREAK=$VERSION" >> Profile
+  cbd init
+  #cbd pull
+  
   cbd startdb
   cbd migrate cbdb up
   if cbd migrate cbdb status|grep "MyBatis Migrations SUCCESS" ; then
