@@ -41,6 +41,12 @@ release() {
     gh-release create sequenceiq/docker-$DBNAME "${ver}"
 }
 
+update_dockerfile() {
+    declare ver=${1:? version required}
+     
+    sed -i "/^ENV VERSION/ s/[0-9\.]*$/${ver}/" Dockerfile
+}
+
 main() {
     clean
     start_db "$@"
