@@ -45,10 +45,14 @@ update_dockerfile() {
     declare ver=${1:? version required}
      
     sed -i "/^ENV VERSION/ s/[0-9\.]*$/${ver}/" Dockerfile
+    git add Dockerfile
+    git commit -m "Update Dockerfile to v${ver}"
+    git push origin master
 }
 
 main() {
     clean
+    update_dockerfile "$@"
     start_db "$@"
     db_backup "$@"
     release "$@"
