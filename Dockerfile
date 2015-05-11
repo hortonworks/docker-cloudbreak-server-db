@@ -1,7 +1,10 @@
 FROM postgres:9.4.1
 
-ENV CBDB_VERSION 0.5.32
-ADD https://github.com/sequenceiq/docker-cbdb/releases/download/v${CBDB_VERSION}/cbdb-${CBDB_VERSION}.tgz /initdb/
+ENV DBNAME cbdb
+ENV VERSION 0.5.32
+ENV BACKUP_TGZ /initdb/$DBNAME-$VERSION.tgz
+
+ADD https://github.com/sequenceiq/docker-${DBNAME}/releases/download/v${VERSION}/cbdb-${VERSION}.tgz $BACKUP_TGZ
 ADD /start /
 
 ENTRYPOINT [ "/start" ]

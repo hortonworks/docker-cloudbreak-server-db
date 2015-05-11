@@ -5,7 +5,7 @@
 main() {
     if ! [ -f /var/lib/postgresql/data/postgresql.conf ]; then
         echo "[INFO] no DB found, intialize it from tgz"
-        tar -xzvf /initdb/*.tgz -C /var/lib/postgresql/data/
+        tar -xzvf $BACKUP_TGZ -C /var/lib/postgresql/data/
     else
         echo "[INFO] previous DB found, leave it ..."
     fi
