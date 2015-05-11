@@ -12,8 +12,8 @@ start_db(){
   #cbd pull
   
   cbd startdb
-  cbd migrate $DBNAME up
-  if cbd migrate $DBNAME status|grep "MyBatis Migrations SUCCESS" ; then
+  cbd migrate ${DBNAME} up
+  if cbd migrate ${DBNAME} status|grep "MyBatis Migrations SUCCESS" ; then
       echo Migration: OK
   else
       echo Migration: ERROR
@@ -26,10 +26,10 @@ db_backup() {
     declare ver=${1:? version required}
 
     # for gracefull shutdown: run another containe with --volumes from
-    # docker exec $DBNAME bash -c 'kill -INT $(head -1 /var/lib/postgresql/data/postmaster.pid)'
+    # docker exec ${DBNAME} bash -c 'kill -INT $(head -1 /var/lib/postgresql/data/postmaster.pid)'
     
     mkdir -p release
-    docker exec  cbreak_$DBNAME_1 tar cz -C /var/lib/postgresql/data . > release/$DBNAME-${ver}.tgz
+    docker exec  cbreak_${DBNAME}_1 tar cz -C /var/lib/postgresql/data . > release/${DBNAME}-${ver}.tgz
 }
 
 clean() {
@@ -38,7 +38,7 @@ clean() {
 
 release() {
     declare ver=${1:? version required}
-    gh-release create sequenceiq/docker-$DBNAME "${ver}"
+    gh-release create sequenceiq/docker-${DBNAME} "${ver}"
 }
 
 update_dockerfile() {
