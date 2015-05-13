@@ -13,13 +13,15 @@ setup() {
 start_db(){
 
   declare ver=${1:? version required}
-  
+
   echo 'export PUBLIC_IP=1.1.1.1'>Profile
   echo "export DOCKER_TAG_${APP_NAME}=${ver}" >> Profile
   cbd init
   #cbd pull
-  
-  cbd startdb
+
+  $(cbd env export | grep POSTGRES)
+
+  docker run -d --name cbreak_${DBNAME}_1 postgres:${DOCKER_TAG_POSTGRES}
   cbd migrate ${DBNAME} up
   if cbd migrate ${DBNAME} status|grep "MyBatis Migrations SUCCESS" ; then
       echo Migration: OK
@@ -35,9 +37,10 @@ db_backup() {
 
     # for gracefull shutdown: run another containe with --volumes from
     # docker exec ${DBNAME} bash -c 'kill -INT $(head -1 /var/lib/postgresql/data/postmaster.pid)'
-    
+
     mkdir -p release
     docker exec  cbreak_${DBNAME}_1 tar cz -C /var/lib/postgresql/data . > release/${DBNAME}-${ver}.tgz
+    docker rm -f cbreak_${DBNAME}_1 
 }
 
 clean() {
@@ -51,7 +54,7 @@ release() {
 
 update_dockerfile() {
     declare ver=${1:? version required}
-     
+
     sed -i "/^ENV VERSION/ s/[0-9\.]*$/${ver}/" Dockerfile
     git add Dockerfile
     git commit -m "Update Dockerfile to v${ver}"
