@@ -1,13 +1,21 @@
 #!/bin/bash
 
 DBNAME=cbdb
+APP_NAME=CLOUDBREAK
+: ${GITHUB_ACCESS_TOKEN:?"Please create GITHUB_ACCESS_TOKEN on GitHub https://github.com/settings/tokens/new"}
+
+setup() {
+  if ! gh-release -v &> /dev/null; then
+    go get github.com/progrium/gh-release
+  fi
+}
 
 start_db(){
 
   declare ver=${1:? version required}
   
   echo 'export PUBLIC_IP=1.1.1.1'>Profile
-  echo "export DOCKER_TAG_CLOUDBREAK=$ver" >> Profile
+  echo "export DOCKER_TAG_${APP_NAME}=${ver}" >> Profile
   cbd init
   #cbd pull
   
@@ -51,6 +59,7 @@ update_dockerfile() {
 }
 
 main() {
+    setup
     clean
     update_dockerfile "$@"
     start_db "$@"
