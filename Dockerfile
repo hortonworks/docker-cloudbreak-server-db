@@ -1,7 +1,7 @@
 FROM postgres:9.4.1
 
 ENV DBNAME cbdb
-ENV VERSION 0.5.92
+ENV VERSION 0.5.103
 ENV BACKUP_TGZ /initdb/$DBNAME-$VERSION.tgz
 
 ADD https://github.com/sequenceiq/docker-${DBNAME}/releases/download/v${VERSION}/${DBNAME}-${VERSION}.tgz $BACKUP_TGZ
