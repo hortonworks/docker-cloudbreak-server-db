@@ -40,7 +40,7 @@ db_backup() {
 
     mkdir -p release
     docker exec  cbreak_${DBNAME}_1 tar cz -C /var/lib/postgresql/data . > release/${DBNAME}-${ver}.tgz
-    docker rm -f cbreak_${DBNAME}_1 
+    docker rm -f cbreak_${DBNAME}_1
 }
 
 clean() {
@@ -55,7 +55,7 @@ release() {
 update_dockerfile() {
     declare ver=${1:? version required}
 
-    sed -i "/^ENV VERSION/ s/[0-9\.]*$/${ver}/" Dockerfile
+    sed -i "s/^ENV VERSION.*/ENV VERSION ${ver}/" Dockerfile
     git add Dockerfile
     git commit -m "Update Dockerfile to v${ver}"
     git push origin master
