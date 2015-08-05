@@ -16,8 +16,6 @@ start_db(){
 
   echo 'export PUBLIC_IP=1.1.1.1'>Profile
   echo "export DOCKER_TAG_${APP_NAME}=${ver}" >> Profile
-  cbd init
-  #cbd pull
 
   $(cbd env export | grep POSTGRES)
 
