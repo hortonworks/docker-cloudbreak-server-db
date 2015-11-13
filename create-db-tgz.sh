@@ -3,6 +3,8 @@
 DBNAME=cbdb
 APP_NAME=CLOUDBREAK
 : ${GITHUB_ACCESS_TOKEN:?"Please create GITHUB_ACCESS_TOKEN on GitHub https://github.com/settings/tokens/new"}
+: ${DOCKERHUB_USERNAME:?"The DOCKERHUB_USERNAME environment variable must be set!"}
+: ${DOCKERHUB_PASSWORD:?"The DOCKERHUB_PASSWORD environment variable must be set!"}
 
 setup() {
   if ! gh-release -v &> /dev/null; then
@@ -22,7 +24,7 @@ start_db(){
   docker run -d --name cbreak_${DBNAME}_1 postgres:${DOCKER_TAG_POSTGRES}
   cbd regenerate
   cbd migrate ${DBNAME} up
-  if cbd migrate ${DBNAME} status|grep "MyBatis Migrations SUCCESS" ; then
+  if cbd migrate ${DBNAME} status 2>&1|grep "Migration SUCCESS" ; then
       echo Migration: OK
   else
       echo Migration: ERROR
@@ -40,6 +42,7 @@ db_backup() {
     mkdir -p release
     docker exec  cbreak_${DBNAME}_1 tar cz -C /var/lib/postgresql/data . > release/${DBNAME}-${ver}.tgz
     docker rm -f cbreak_${DBNAME}_1
+    cbd kill
 }
 
 clean() {
@@ -60,6 +63,22 @@ update_dockerfile() {
     git push origin master
 }
 
+install_deps() {
+  if ! dockerhub-tag --version &>/dev/null ;then
+    echo "---> installing dockerhub-tag binary to /usr/local/bin" 1>&2
+    curl -L https://github.com/progrium/dockerhub-tag/releases/download/v0.2.0/dockerhub-tag_0.2.0_Darwin_x86_64.tgz | tar -xz -C /usr/local/bin/
+  else
+    echo "---> dockerhub-tag already installed" 1>&2
+  fi
+}
+
+trigger_image_build() {
+  declare ver=${1:? version required}
+
+  install_deps
+  dockerhub-tag set sequenceiq/cbdb "${ver}" "v${ver}" /
+}
+
 main() {
     setup
     clean
@@ -67,6 +86,7 @@ main() {
     start_db "$@"
     db_backup "$@"
     release "$@"
+    trigger_image_build "$@"
 }
 
 [[ "$0" ==  "$BASH_SOURCE" ]] && main "$@"
