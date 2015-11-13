@@ -20,6 +20,7 @@ start_db(){
   $(cbd env export | grep POSTGRES)
 
   docker run -d --name cbreak_${DBNAME}_1 postgres:${DOCKER_TAG_POSTGRES}
+  cbd regenerate
   cbd migrate ${DBNAME} up
   if cbd migrate ${DBNAME} status|grep "MyBatis Migrations SUCCESS" ; then
       echo Migration: OK
