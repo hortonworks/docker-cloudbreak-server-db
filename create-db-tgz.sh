@@ -24,6 +24,7 @@ start_db(){
   docker run -d --name cbreak_${DBNAME}_1 postgres:${DOCKER_TAG_POSTGRES}
   cbd regenerate
   cbd migrate ${DBNAME} up
+  cbd migrate ${DBNAME} pending
   if cbd migrate ${DBNAME} status 2>&1|grep "Migration SUCCESS" ; then
       echo Migration: OK
   else
