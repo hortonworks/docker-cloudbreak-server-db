@@ -1,4 +1,5 @@
 FROM postgres:9.4.1
+MAINTAINER Hortonworks
 
 ENV REPONAME cloudbreak-server-db
 ENV DBNAME cbdb
