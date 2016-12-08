@@ -1,7 +1,10 @@
-#!/bin/bash
+#!/bin/bash -x
+set -e -o pipefail
 
+export DEBUG=1
 DBNAME=cbdb
 APP_NAME=CLOUDBREAK
+REPO_NAME=cloudbreak-server-db
 : ${GITHUB_ACCESS_TOKEN:?"Please create GITHUB_ACCESS_TOKEN on GitHub https://github.com/settings/tokens/new"}
 : ${DOCKERHUB_USERNAME:?"The DOCKERHUB_USERNAME environment variable must be set!"}
 : ${DOCKERHUB_PASSWORD:?"The DOCKERHUB_PASSWORD environment variable must be set!"}
@@ -21,7 +24,6 @@ start_db(){
 
   $(cbd env export | grep POSTGRES)
 
-  docker run -d --name cbreak_${DBNAME}_1 postgres:${DOCKER_TAG_POSTGRES}
   cbd regenerate
   cbd migrate ${DBNAME} up
   cbd migrate ${DBNAME} pending
@@ -52,7 +54,7 @@ clean() {
 
 release() {
     declare ver=${1:? version required}
-    gh-release create sequenceiq/docker-${DBNAME} "${ver}"
+    gh-release create hortonworks/docker-"${REPO_NAME}" "${ver}"
 }
 
 update_dockerfile() {
@@ -77,7 +79,7 @@ trigger_image_build() {
   declare ver=${1:? version required}
 
   install_deps
-  dockerhub-tag set sequenceiq/cbdb "${ver}" "v${ver}" /
+  dockerhub-tag set hortonworks/"${REPO_NAME}" "${ver}" "v${ver}" /
 }
 
 main() {
